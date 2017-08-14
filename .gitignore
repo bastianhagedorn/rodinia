@@ -1,5 +1,8 @@
 data/*
 rodinia_3.1.tar.bz2
+## Files used for benchmarking output
+*.out
+*.raw
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
