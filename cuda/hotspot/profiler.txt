@@ -1,0 +1,120 @@
+==2558== NVPROF is profiling process 2558, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2558== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2558== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+527.99ms  149.26ms                    -               -         -         -         -  256.00MB  1.6750GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+678.48ms  117.90ms                    -               -         -         -         -  256.00MB  2.1205GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+796.41ms  17.207ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+813.62ms  152.11ms                    -               -         -         -         -  256.00MB  1.6436GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2577== NVPROF is profiling process 2577, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2577== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2577== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+459.58ms  96.648ms                    -               -         -         -         -  256.00MB  2.5867GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+557.26ms  95.605ms                    -               -         -         -         -  256.00MB  2.6149GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+652.88ms  17.215ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+670.11ms  151.42ms                    -               -         -         -         -  256.00MB  1.6511GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2591== NVPROF is profiling process 2591, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2591== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2591== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+457.27ms  96.698ms                    -               -         -         -         -  256.00MB  2.5854GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+555.20ms  96.101ms                    -               -         -         -         -  256.00MB  2.6014GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+651.32ms  17.217ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+668.55ms  152.22ms                    -               -         -         -         -  256.00MB  1.6424GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2608== NVPROF is profiling process 2608, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2608== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2608== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+455.70ms  96.401ms                    -               -         -         -         -  256.00MB  2.5933GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+553.32ms  95.852ms                    -               -         -         -         -  256.00MB  2.6082GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+649.18ms  17.213ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+666.40ms  151.98ms                    -               -         -         -         -  256.00MB  1.6449GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2626== NVPROF is profiling process 2626, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2626== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2626== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+458.54ms  95.794ms                    -               -         -         -         -  256.00MB  2.6098GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+555.54ms  95.546ms                    -               -         -         -         -  256.00MB  2.6166GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+651.10ms  17.263ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+668.37ms  153.98ms                    -               -         -         -         -  256.00MB  1.6236GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2682== NVPROF is profiling process 2682, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2682== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2682== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+483.24ms  147.91ms                    -               -         -         -         -  256.00MB  1.6903GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+633.54ms  110.53ms                    -               -         -         -         -  256.00MB  2.2619GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+744.12ms  17.205ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+761.33ms  153.04ms                    -               -         -         -         -  256.00MB  1.6335GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2693== NVPROF is profiling process 2693, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2693== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2693== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+460.11ms  95.844ms                    -               -         -         -         -  256.00MB  2.6084GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+557.17ms  95.139ms                    -               -         -         -         -  256.00MB  2.6277GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+652.33ms  17.211ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+669.55ms  151.88ms                    -               -         -         -         -  256.00MB  1.6460GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2708== NVPROF is profiling process 2708, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2708== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2708== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+461.07ms  95.918ms                    -               -         -         -         -  256.00MB  2.6064GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+558.19ms  95.134ms                    -               -         -         -         -  256.00MB  2.6279GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+653.33ms  17.210ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+670.55ms  151.88ms                    -               -         -         -         -  256.00MB  1.6460GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2719== NVPROF is profiling process 2719, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2719== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2719== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+465.80ms  146.74ms                    -               -         -         -         -  256.00MB  1.7036GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+614.92ms  111.71ms                    -               -         -         -         -  256.00MB  2.2380GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+726.65ms  17.200ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+743.87ms  151.94ms                    -               -         -         -         -  256.00MB  1.6454GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
+==2730== NVPROF is profiling process 2730, command: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2730== Profiling application: ./hotspot 8192 1 1 ../../data/hotspot/temp_8192 ../../data/hotspot/power_8192 output.out
+==2730== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+457.45ms  96.100ms                    -               -         -         -         -  256.00MB  2.6015GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+554.78ms  95.471ms                    -               -         -         -         -  256.00MB  2.6186GB/s   Tesla K20c (0)         1         7  [CUDA memcpy HtoD]
+650.26ms  17.212ms          (586 586 1)       (16 16 1)        36  3.0000KB        0B         -           -   Tesla K20c (0)         1         7  calculate_temp(int, float*, float*, float*, int, int, int, int, float, float, float, float, float, float) [110]
+667.48ms  152.21ms                    -               -         -         -         -  256.00MB  1.6425GB/s   Tesla K20c (0)         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
