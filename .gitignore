@@ -1,5 +1,7 @@
 data/*
 rodinia_3.1.tar.bz2
+opencl/hotspot/hotspot
+
 ## Files used for benchmarking output
 *.out
 *.raw
