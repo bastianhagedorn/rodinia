@@ -1,7 +1,7 @@
 
 #!/bin/bash
-if [ "$#" -ne 1 ]; then
-				echo "Illegal number of parameters (enter input size)"
+if [ "$#" -ne 3 ]; then
+				echo "Illegal number of parameters (enter platform, device and input size)"
 				exit -1
 fi
 
@@ -9,11 +9,9 @@ fi
 rm hotspot.raw
 rm hotspot.out
 
-echo temp_$1
-
 for i in {1..10}
 do
-./hotspot $1 1 1 ../../data/hotspot/temp_$1 ../../data/hotspot/power_$1 output.out >> hotspot.raw
+./hotspot $3 1 1 ../../data/hotspot/temp_$3 ../../data/hotspot/power_$3 output.out $1 $2 >> hotspot.raw
 done
 
 cat hotspot.raw | grep DEBUG | awk '{print $4}' > hotspot.out
