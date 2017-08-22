@@ -339,4 +339,25 @@ float accuracy(float *arr1, float *arr2, int len)
 }
  
 
+double getTimeForAllEvents(int numEvents, cl_event* events)
+{
+    double time = 0.0;
+    cl_int err;
 
+    err = clWaitForEvents(numEvents,events);
+    
+    cl_ulong start,end;
+    
+    int k;
+
+    for(k=0; k<numEvents; k++)
+    {
+        err = clGetEventProfilingInfo(events[k],CL_PROFILING_COMMAND_END, 
+                    sizeof(cl_ulong), &end, NULL);
+        err = clGetEventProfilingInfo(events[k],CL_PROFILING_COMMAND_START, 
+                    sizeof(cl_ulong), &start, NULL);
+        time += ((double)end-(double)start);
+    }
+
+    return time;
+}

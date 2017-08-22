@@ -16,3 +16,4 @@ void computeTempCPU(float* pIn, float *tIn, float *tOut,
                int nx, int ny, int nz, float Cap,
                float Rx, float Ry, float Rz, 
                float dt, float amb_temp, int numiter); 
+double getTimeForAllEvents(int numEvents, cl_event* events);

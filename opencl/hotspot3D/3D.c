@@ -59,6 +59,8 @@ int main(int argc, char** argv)
   int numRows      = atoi(argv[1]);
   int layers       = atoi(argv[2]);
 
+  cl_event events[iterations];
+
   /* calculating parameters*/
 
   float dx         = chip_height/numRows;
@@ -148,7 +150,7 @@ int main(int argc, char** argv)
       return EXIT_FAILURE;
     }
 
-  commands = clCreateCommandQueue(context, device_id, 0, &err);
+  commands = clCreateCommandQueue(context, device_id, CL_QUEUE_PROFILING_ENABLE, &err);
   if (!commands)
     {
       printf("Error: Failed to create a command commands!\n%s\n", err_code(err));
@@ -241,7 +243,7 @@ int main(int argc, char** argv)
       local[0] = WG_SIZE_X;
       local[1] = WG_SIZE_Y;
 
-      err = clEnqueueNDRangeKernel(commands, ko_vadd, 2, NULL, global, local, 0, NULL, NULL);
+      err = clEnqueueNDRangeKernel(commands, ko_vadd, 2, NULL, global, local, 0, NULL, &events[j]);
       if (err)
         {
           printf("Error: Failed to execute kernel!\n%s\n", err_code(err));
@@ -267,7 +269,7 @@ int main(int argc, char** argv)
 
   float acc = accuracy(tempOut,answer,numRows*numCols*layers);
   float time = (float)((stop - start)/(1000.0 * 1000.0));
-  printf("Time: %.3f (s)\n",time);
+  printf("Time: %.6f (s)\n",getTimeForAllEvents(iterations,events));
   printf("Accuracy: %e\n",acc);
 
   writeoutput(tempOut,numRows,numCols,layers,ofile);
