@@ -4,13 +4,13 @@
 #include <CL/cl.h>
 #include "CL_helper.h"
 #include "../hotspot/OpenCL_helper_library.h"
+#include "../include/constants.h"
 
 #ifndef DEVICE
 #define DEVICE CL_DEVICE_TYPE_DEFAULT
 #endif
 
 #define TOL      (0.001)
-#define STR_SIZE (256)
 #define MAX_PD   (3.0e6)
 
 /* required precision in degrees	*/
@@ -23,10 +23,6 @@
 
 #define WG_SIZE_X (64)
 #define WG_SIZE_Y (4)
-float t_chip      = 0.0005;
-float chip_height = 0.016;
-float chip_width  = 0.016;
-float amb_temp    = 80.0;
 
 void usage(int argc, char **argv)
 {
