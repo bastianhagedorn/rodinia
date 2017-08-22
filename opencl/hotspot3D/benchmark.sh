@@ -17,7 +17,7 @@ echo ./3D $3 $4 $5 $DATADIR/hotspot3D/power_$3x$4 $DATADIR/hotspot3D/temp_$3x$4 
 
 for i in $(seq 1 $N)
 do
-./3D $3 $4 $5 $DATADIR/hotspot3D/power_$3x$4 $DATADIR/hotspot3D/temp_$3x$4  output.out >> hotspot3D.raw
+./3D $3 $4 $5 $DATADIR/hotspot3D/power_$3x$4 $DATADIR/hotspot3D/temp_$3x$4  output.out 0 0 >> hotspot3D.raw
 done
 
 cat hotspot3D.raw | grep Time: | awk '{print $2}' > hotspot3D.out
