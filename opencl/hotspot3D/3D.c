@@ -109,8 +109,6 @@ int main(int argc, char** argv)
   const char *KernelSource = load_kernel_source("hotspotKernel.cl"); 
 
 
-//  printf("WG size of kernel = %d X %d\n", BLOCK_SIZE, BLOCK_SIZE);
-  
   cl_int err;
   cl_uint numPlatforms;
   
