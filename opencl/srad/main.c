@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   //	INPUT ARGUMENTS
   //======================================================================================================================================================150
 
-  if (argc != 5) {
+  if (argc != 7) {
     printf("ERROR: wrong number of arguments\n");
     return 0;
   } else {
@@ -112,6 +112,10 @@ int main(int argc, char *argv[]) {
   }
 
   time1 = get_time();
+
+  int platform_idx = atoi(argv[5]);
+  int device_idx = atoi(argv[6]);
+
 
   //======================================================================================================================================================150
   // 	READ INPUT FROM FILE
@@ -198,7 +202,9 @@ int main(int argc, char *argv[]) {
                             lambda,               // update step size
                             NeROI,                // ROI nbr of elements
                             iN, iS, jE, jW, iter, // primary loop
-                            mem_size_i, mem_size_j);
+                            mem_size_i, mem_size_j,
+                            platform_idx,
+                            device_idx);
 
   time4 = get_time();
 

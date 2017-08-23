@@ -50,7 +50,9 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
                                long NeROI, // ROI nbr of elements
                                int *iN, int *iS, int *jE, int *jW,
                                int iter,   // primary loop
-                               int mem_size_i, int mem_size_j) {
+                               int mem_size_i, int mem_size_j, 
+                               int platform_idx,
+                               int device_idx){
 
   //======================================================================================================================================================150
   //	GPU SETUP
@@ -83,7 +85,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     fatal_CL(error, __LINE__);
 
   // Select the 1st platform
-  cl_platform_id platform = platforms[0];
+  cl_platform_id platform = platforms[platform_idx];
 
   // Get the name of the selected platform and print it (if there are multiple
   // platforms, choose the first one)
@@ -130,7 +132,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // Select the first device (previousely selected for the context) (if there
   // are multiple devices, choose the first one)
   cl_device_id device;
-  device = devices[0];
+  device = devices[device_idx];
 
   // Get the name of the selected device (previousely selected for the context)
   // and print it

@@ -1,20 +1,24 @@
 #!/bin/bash
-DATADIR=/home/v1bhaged/benchmarks/rodinia/data
+N=10
 
-if [ "$#" -ne 3 ]; then
-				echo "Illegal number of parameters (enter platform, device and input size)"
+if [ "$#" -ne 5 ]; then
+				echo "Illegal number of parameters (enter platform, device, iterations, rows and columns)"
 				exit -1
 fi
 
 
-# prints kernel runtime in nanoseconds to hotspot.out using kernel event times
-rm hotspot.raw
-rm hotspot.out
+# prints kernel runtime in nanoseconds to srad.out using kernel event times
 
-for i in {1..10}
+rm srad1.out
+rm srad2.out
+rm srad.raw
+
+for i in $(seq 1 $N)
 do
-./hotspot $3 1 1 $DATADIR/hotspot/temp_$3 $DATADIR/hotspot/power_$3 output.out $1 $2 >> hotspot.raw
+./srad $3 0.5 $4 $5 $1 $2 >> srad.raw
 done
 
-cat hotspot.raw | grep DEBUG | awk '{print $4}' > hotspot.out
-cat hotspot.out
+cat srad.raw | grep SRAD | awk '{print $2}' > srad1.out
+cat srad.raw | grep SRAD | awk '{print $4}' > srad2.out
+cat srad1.out
+cat srad2.out
