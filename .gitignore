@@ -18,7 +18,6 @@ opencl/hotspot/hotspot
 *.fot
 *.cb
 *.cb2
-*.pgm
 
 ## Currently opened files
 *.swp
