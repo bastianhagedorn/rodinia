@@ -1,6 +1,5 @@
 // statistical kernel
-__global__ void
-extract(long d_Ne, fp *d_I) { // pointer to input image (DEVICE GLOBAL MEMORY)
+__global__ void extract(long d_Ne, fp *d_I) { // pointer to input image (DEVICE GLOBAL MEMORY)
 
   // indexes
   int bx = blockIdx.x;  // get current horizontal block index

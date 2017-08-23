@@ -25,7 +25,7 @@
 //	UTILITIES
 //======================================================================================================================================================150
 
-#include "./../util/opencl/opencl.h" // (in directory)							needed by device functions
+#include "CL_helper.h"
 
 //======================================================================================================================================================150
 //	KERNEL_GPU_CUDA_WRAPPER FUNCTION HEADER
@@ -62,6 +62,8 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
 
   // common variables
   cl_int error;
+  cl_event srad1Events[niter];
+  cl_event srad2Events[niter];
 
   //====================================================================================================100
   //	GET PLATFORMS (Intel, AMD, NVIDIA, based on provided library), SELECT ONE
@@ -143,7 +145,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
 
   // Create a command queue
   cl_command_queue command_queue;
-  command_queue = clCreateCommandQueue(context, device, 0, &error);
+  command_queue = clCreateCommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, &error);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
@@ -707,7 +709,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     // launch kernel
     error = clEnqueueNDRangeKernel(command_queue, srad_kernel, 1, NULL,
                                    global_work_size, local_work_size, 0, NULL,
-                                   NULL);
+                                    &srad1Events[iter]);
     if (error != CL_SUCCESS)
       fatal_CL(error, __LINE__);
 
@@ -723,7 +725,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     // launch kernel
     error = clEnqueueNDRangeKernel(command_queue, srad2_kernel, 1, NULL,
                                    global_work_size, local_work_size, 0, NULL,
-                                   NULL);
+                                   &srad2Events[iter]);
     if (error != CL_SUCCESS)
       fatal_CL(error, __LINE__);
 
@@ -776,6 +778,12 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //====================================================================================================100
   //	End
   //====================================================================================================100
+
+  
+    double kernel1Time = getTimeForAllEvents(niter,srad1Events);
+    double kernel2Time = getTimeForAllEvents(niter,srad2Events);
+
+    printf("SRAD1: %f SRAD2: %f\n",kernel1Time,kernel2Time);
 
   //======================================================================================================================================================150
   // 	COPY RESULTS BACK TO CPU

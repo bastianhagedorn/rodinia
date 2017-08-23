@@ -1,26 +1,27 @@
 include ../../common/make.config
 
 OCL_INC_DIR = -I$(OPENCL_INC)
+INC_DIR = -I../include/
 OCL_LIB_DIR = -L$(OPENCL_LIB)
 
 C_C = gcc
 OCL_LIB = -lOpenCL
 
 ./a.out:	./main.o \
-			./kernel/kernel_gpu_opencl_wrapper.o \
-			./util/opencl/opencl.o \
 			./util/graphics/graphics.o \
 			./util/graphics/resize.o \
-			./util/timer/timer.o
+			./util/timer/timer.o \
+			../include/CL_helper.o \
+			./kernel/kernel_gpu_opencl_wrapper.o
 	$(C_C)	./main.o \
 			./kernel/kernel_gpu_opencl_wrapper.o \
-			./util/opencl/opencl.o \
 			./util/graphics/graphics.o \
 			./util/graphics/resize.o \
 			./util/timer/timer.o \
 			-lm \
 			$(OCL_LIB_DIR) \
-			$(OCL_LIB) -o srad
+			$(OCL_LIB) \
+			$(INC_DIR) -o srad
 
 # ======================================================================================================================================================150
 #	MAIN FUNCTION
@@ -30,6 +31,7 @@ OCL_LIB = -lOpenCL
 			./main.c
 	$(C_C)	$(KERNEL_DIM) ./main.c \
 			-c \
+			$(INC_DIR) \
 			-o ./main.o \
 			-O3
 
@@ -41,6 +43,7 @@ OCL_LIB = -lOpenCL
 										./kernel/kernel_gpu_opencl_wrapper.c
 	$(C_C)	$(KERNEL_DIM) ./kernel/kernel_gpu_opencl_wrapper.c \
 			-c \
+			$(INC_DIR) \
 			-o ./kernel/kernel_gpu_opencl_wrapper.o \
 			-O3 \
 			$(OCL_INC_DIR)
@@ -70,13 +73,13 @@ OCL_LIB = -lOpenCL
 			-o ./util/timer/timer.o \
 			-O3
 
-./util/opencl/opencl.o:	./util/opencl/opencl.h \
-						./util/opencl/opencl.c
-	$(C_C)	./util/opencl/opencl.c \
+../include/CL_helper.o: ../include/CL_helper.h \
+    						../include/CL_helper.c
+	$(C_C)	../include/CL_helper.c \
 			-c \
-			-o ./util/opencl/opencl.o \
+			-o ../include/CL_helper.o \
 			-O3 \
-			$(OCL_INC_DIR)
+			$(INC_DIR)
 
 clean:
 	rm	./*.o srad\
@@ -84,3 +87,4 @@ clean:
 		./util/opencl/*.o \
 		./util/graphics/*.o \
 		./util/timer/*.o
+		../include/CL_helper.o
