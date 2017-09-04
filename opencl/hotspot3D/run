@@ -1,4 +1,4 @@
 #!/bin/bash
-DATADIR=/home/v1bhaged/benchmarks/rodinia/data
+DATADIR=/home/odroid/benchmarks/rodinia/data 
 
 ./3D 512 8 100 $DATADIR/hotspot3D/power_512x8 $DATADIR/hotspot3D/temp_512x8 output.out 0 0 

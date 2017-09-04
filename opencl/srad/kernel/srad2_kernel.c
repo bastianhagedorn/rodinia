@@ -2,7 +2,7 @@
 // CORRUPTION
 
 // srad kernel
-__global__ void srad2(fp d_lambda, int d_Nr, int d_Nc, long d_Ne, int *d_iN,
+__global__ void srad2(fp d_lambda, int d_Nr, int d_Nc, int d_Ne, int *d_iN,
                       int *d_iS, int *d_jE, int *d_jW, fp *d_dN, fp *d_dS,
                       fp *d_dE, fp *d_dW, fp *d_c, fp *d_I) {
 

@@ -1,6 +1,6 @@
 // statistical kernel
 __global__ void
-compress(long d_Ne, fp *d_I) { // pointer to output image (DEVICE GLOBAL MEMORY)
+compress(int d_Ne, fp *d_I) { // pointer to output image (DEVICE GLOBAL MEMORY)
 
   // indexes
   int bx = blockIdx.x;  // get current horizontal block index

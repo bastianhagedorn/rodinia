@@ -65,12 +65,12 @@ int main(int argc, char *argv[]) {
   fp *image_ori; // originalinput image
   int image_ori_rows;
   int image_ori_cols;
-  long image_ori_elem;
+  int image_ori_elem;
 
   // inputs image, input paramenters
   fp *image;  // input image
   int Nr, Nc; // IMAGE nbr of rows/cols/elements
-  long Ne;
+  int Ne;
 
   // algorithm parameters
   int niter; // nbr of iterations
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
   // size of IMAGE
   int r1, r2, c1, c2; // row/col coordinates of uniform ROI
-  long NeROI;         // ROI nbr of elements
+  int NeROI;         // ROI nbr of elements
 
   // surrounding pixel indicies
   int *iN;
@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
 
   // counters
   int iter; // primary loop
-  long i;   // image row
-  long j;   // image col
+  int i;   // image row
+  int j;   // image col
 
   // memory sizes
   int mem_size_i;

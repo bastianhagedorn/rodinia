@@ -17,7 +17,7 @@
 //========================================================================================================================================================================================================200
 
 __kernel void 
-extract_kernel(long d_Ne,
+extract_kernel(int d_Ne,
 				__global fp* d_I){											// pointer to input image (DEVICE GLOBAL MEMORY)
 
 	// indexes
@@ -39,7 +39,7 @@ extract_kernel(long d_Ne,
 //========================================================================================================================================================================================================200
 
 __kernel void 
-prepare_kernel(	long d_Ne,
+prepare_kernel(	int d_Ne,
 				__global fp* d_I,											// pointer to output image (DEVICE GLOBAL MEMORY)
 				__global fp* d_sums,										// pointer to input image (DEVICE GLOBAL MEMORY)
 				__global fp* d_sums2){
@@ -64,8 +64,8 @@ prepare_kernel(	long d_Ne,
 //========================================================================================================================================================================================================200
 
 __kernel void 
-reduce_kernel(	long d_Ne,													// number of elements in array
-				long d_no,													// number of sums to reduce
+reduce_kernel(	int d_Ne,													// number of elements in array
+				int d_no,													// number of sums to reduce
 				int d_mul,													// increment
 				__global fp* d_sums,										// pointer to partial sums variable (DEVICE GLOBAL MEMORY)
 				__global fp* d_sums2,
@@ -181,7 +181,7 @@ __kernel void
 srad_kernel(fp d_lambda, 
 			int d_Nr, 
 			int d_Nc, 
-			long d_Ne, 
+			int d_Ne, 
 			__global int* d_iN, 
 			__global int* d_iS, 
 			__global int* d_jE, 
@@ -270,7 +270,7 @@ __kernel void
 srad2_kernel(	fp d_lambda, 
 				int d_Nr, 
 				int d_Nc, 
-				long d_Ne, 
+				int d_Ne, 
 				__global int* d_iN, 
 				__global int* d_iS, 
 				__global int* d_jE, 
@@ -324,7 +324,7 @@ srad2_kernel(	fp d_lambda,
 //========================================================================================================================================================================================================200
 
 __kernel void 
-compress_kernel(long d_Ne,
+compress_kernel(int d_Ne,
 				__global fp* d_I){										// pointer to output image (DEVICE GLOBAL MEMORY)
 
 	// indexes

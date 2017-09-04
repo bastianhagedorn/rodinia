@@ -1,5 +1,5 @@
 #!/bin/bash
-DATADIR=/home/v1bhaged/benchmarks/rodinia/data
+DATADIR=/home/odroid/benchmarks/rodinia/data 
 N=10
 
 if [ "$#" -ne 5 ]; then

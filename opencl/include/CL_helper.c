@@ -232,7 +232,6 @@ char *load_kernel_source(const char *filename) {
     // Return the pointer to the string
     return source;
 }
-/*
 void readinput(float *vect, int grid_rows, int grid_cols, int layers, char *file) {
 
     int i,j,k;
@@ -284,7 +283,7 @@ void writeoutput(float *vect, int grid_rows, int grid_cols, int layers, char *fi
 
     fclose(fp);	
 }
-*/
+
 void computeTempCPU(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 

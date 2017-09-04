@@ -44,10 +44,10 @@
 void kernel_gpu_opencl_wrapper(fp *image,  // input image
                                int Nr,     // IMAGE nbr of rows
                                int Nc,     // IMAGE nbr of cols
-                               long Ne,    // IMAGE nbr of elem
+                               int Ne,    // IMAGE nbr of elem
                                int niter,  // nbr of iterations
                                fp lambda,  // update step size
-                               long NeROI, // ROI nbr of elements
+                               int NeROI, // ROI nbr of elements
                                int *iN, int *iS, int *jE, int *jW,
                                int iter,   // primary loop
                                int mem_size_i, int mem_size_j, 
@@ -417,9 +417,12 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //	set arguments
   //====================================================================================================100
 
-  error = clSetKernelArg(extract_kernel, 0, sizeof(long), (void *)&Ne);
-  if (error != CL_SUCCESS)
+  error = clSetKernelArg(extract_kernel, 0, sizeof(int), (void *)&Ne);
+  if (error != CL_SUCCESS){
     fatal_CL(error, __LINE__);
+    printf("error ! \n");
+  }
+
   error = clSetKernelArg(extract_kernel, 1, sizeof(cl_mem), (void *)&d_I);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
@@ -455,7 +458,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //	Prepare Kernel
   //====================================================================================================100
 
-  error = clSetKernelArg(prepare_kernel, 0, sizeof(long), (void *)&Ne);
+  error = clSetKernelArg(prepare_kernel, 0, sizeof(int), (void *)&Ne);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clSetKernelArg(prepare_kernel, 1, sizeof(cl_mem), (void *)&d_I);
@@ -475,7 +478,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   int blocks2_x;
   int blocks2_work_size;
   size_t global_work_size2[1];
-  long no;
+  int no;
   int mul;
   int mem_size_single = sizeof(fp) * 1;
   fp total;
@@ -485,7 +488,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   fp varROI;
   fp q0sqr;
 
-  error = clSetKernelArg(reduce_kernel, 0, sizeof(long), (void *)&Ne);
+  error = clSetKernelArg(reduce_kernel, 0, sizeof(int), (void *)&Ne);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clSetKernelArg(reduce_kernel, 3, sizeof(cl_mem), (void *)&d_sums);
@@ -508,7 +511,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   error = clSetKernelArg(srad_kernel, 2, sizeof(int), (void *)&Nc);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
-  error = clSetKernelArg(srad_kernel, 3, sizeof(long), (void *)&Ne);
+  error = clSetKernelArg(srad_kernel, 3, sizeof(int), (void *)&Ne);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clSetKernelArg(srad_kernel, 4, sizeof(cl_mem), (void *)&d_iN);
@@ -555,7 +558,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   error = clSetKernelArg(srad2_kernel, 2, sizeof(int), (void *)&Nc);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
-  error = clSetKernelArg(srad2_kernel, 3, sizeof(long), (void *)&Ne);
+  error = clSetKernelArg(srad2_kernel, 3, sizeof(int), (void *)&Ne);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clSetKernelArg(srad2_kernel, 4, sizeof(cl_mem), (void *)&d_iN);
@@ -636,7 +639,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     while (blocks2_work_size != 0) {
 
       // set arguments that were uptaded in this loop
-      error = clSetKernelArg(reduce_kernel, 1, sizeof(long), (void *)&no);
+      error = clSetKernelArg(reduce_kernel, 1, sizeof(int), (void *)&no);
       if (error != CL_SUCCESS)
         fatal_CL(error, __LINE__);
       error = clSetKernelArg(reduce_kernel, 2, sizeof(int), (void *)&mul);
@@ -752,7 +755,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // set parameters
   //====================================================================================================100
 
-  error = clSetKernelArg(compress_kernel, 0, sizeof(long), (void *)&Ne);
+  error = clSetKernelArg(compress_kernel, 0, sizeof(int), (void *)&Ne);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clSetKernelArg(compress_kernel, 1, sizeof(cl_mem), (void *)&d_I);

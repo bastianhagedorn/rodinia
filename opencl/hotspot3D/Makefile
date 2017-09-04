@@ -1,6 +1,4 @@
-ifndef CC
-	CC = gcc
-endif
+CC = gcc
 
 OUTPUT = *.out
 CCFLAGS=-O3 -lm 
@@ -12,7 +10,7 @@ OPENCL_LIB = $(OPENCL_DIR)/lib/x86_64/ -lOpenCL
 INC=../include/ 
 
 3D: 3D.c ../include/CL_helper.c 
-	$(CC) $^ $(CCFLAGS) $(LIBS) -I$(OPENCL_INC)-I$(INC)  -L$(OPENCL_LIB) -o $@
+	$(CC) $^ $(CCFLAGS) $(LIBS) -I$(INC)   -o $@
 
 clean:
 	rm -f 3D $(OUTPUT) 

@@ -148,7 +148,10 @@ int main(int argc, char** argv)
   device = devices[device_id];
   err = clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(pbuf), pbuf, NULL);
   if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
-  printf("Device: %s\n", pbuf);
+  printf("Device Name: %s\n", pbuf);
+	cl_uint x_val;
+  err = clGetDeviceInfo(device,  CL_DEVICE_MAX_COMPUTE_UNITS , sizeof(x_val), &x_val, NULL);
+  printf("Compute Units: %d\n", x_val);
 
 
 

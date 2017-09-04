@@ -15,7 +15,7 @@ srad: main.c ../include/CL_helper.c \
       kernel/kernel_gpu_opencl_wrapper.c \
       util/graphics/graphics.c \
       util/graphics/resize.c 
-	$(CC) $^ $(CCFLAGS) -I$(OPENCL_INC) -I$(INC) -I./kernel $(LIBS) -L$(OPENCL_LIB) -o $@
+	$(CC) $(KERNEL_DIM) $^ $(CCFLAGS) -I$(OPENCL_INC) -I$(INC) -I./kernel $(LIBS) -L$(OPENCL_LIB) -o $@
 
 clean:
 	rm -f srad $(OUTPUT) 

@@ -1,6 +1,6 @@
 // statistical kernel
 __global__ void
-reduce(long d_Ne,  // number of elements in array
+reduce(int d_Ne,  // number of elements in array
        int d_no,   // number of sums to reduce
        int d_mul,  // increment
        fp *d_sums, // pointer to partial sums variable (DEVICE GLOBAL MEMORY)
