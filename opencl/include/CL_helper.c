@@ -362,6 +362,59 @@ double getTimeForAllEvents(int numEvents, cl_event* events)
     return time;
 }
 
+void readinput(float *vect, int grid_rows, int grid_cols, int layers, char *file) {
+
+    int i,j,k;
+    FILE *fp;
+    char str[STR_SIZE];
+    float val;
+
+    if( (fp  = fopen(file, "r" )) ==0 )
+      fatal( "The file was not opened" );
+
+
+    for (i=0; i <= grid_rows-1; i++) 
+      for (j=0; j <= grid_cols-1; j++)
+        for (k=0; k <= layers-1; k++)
+          {
+            if (fgets(str, STR_SIZE, fp) == NULL) fatal("Error reading file\n");
+            if (feof(fp))
+              fatal("not enough lines in file");
+            //if ((sscanf(str, "%d%f", &index, &val) != 2) || (index != ((i-1)*(grid_cols-2)+j-1)))
+            if ((sscanf(str, "%f", &val) != 1))
+              fatal("invalid file format");
+            vect[i*grid_cols+j+k*grid_rows*grid_cols] = val;
+          }
+
+    fclose(fp);	
+
+}
+
+
+void writeoutput(float *vect, int grid_rows, int grid_cols, int layers, char *file) {
+
+    int i,j,k, index=0;
+    FILE *fp;
+    char str[STR_SIZE];
+
+    if( (fp = fopen(file, "w" )) == 0 )
+      printf( "The file was not opened\n" );
+
+
+    for (i=0; i < grid_rows; i++) 
+      for (j=0; j < grid_cols; j++)
+        for (k=0; k < layers; k++)
+
+          {
+            sprintf(str, "%g\n", vect[i*grid_cols+j+k*grid_rows*grid_cols]);
+            fputs(str,fp);
+            index++;
+          }
+
+    fclose(fp);	
+}
+
+
 
 void fatal_CL(cl_int error, int line_no) {
 

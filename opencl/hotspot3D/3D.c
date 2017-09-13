@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <CL/cl.h>
 #include "CL_helper.h"
-#include "../hotspot/OpenCL_helper_library.h"
 #include "../include/constants.h"
 
 #ifndef DEVICE
