@@ -25,8 +25,9 @@
 //	UTILITIES
 //======================================================================================================================================================150
 
-#include "CL_helper.h"
+#include "./../util/opencl/opencl.h" // (in directory)							needed by device functions
 
+#include "./../util/timer/timer.h"       // (in specified path)
 //======================================================================================================================================================150
 //	KERNEL_GPU_CUDA_WRAPPER FUNCTION HEADER
 //======================================================================================================================================================150
@@ -41,6 +42,9 @@
 //	KERNEL_GPU_CUDA_WRAPPER FUNCTION
 //========================================================================================================================================================================================================200
 
+
+
+
 void kernel_gpu_opencl_wrapper(fp *image,  // input image
                                int Nr,     // IMAGE nbr of rows
                                int Nc,     // IMAGE nbr of cols
@@ -49,10 +53,8 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
                                fp lambda,  // update step size
                                long NeROI, // ROI nbr of elements
                                int *iN, int *iS, int *jE, int *jW,
-                               int iter,   // primary loop
-                               int mem_size_i, int mem_size_j, 
-                               int platform_idx,
-                               int device_idx){
+                               int iter, // primary loop
+                               int mem_size_i, int mem_size_j) {
 
   //======================================================================================================================================================150
   //	GPU SETUP
@@ -64,11 +66,20 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
 
   // common variables
   cl_int error;
+
+  cl_event event1;
+  cl_event event2;
+
   cl_event srad1Events[niter];
   cl_event srad2Events[niter];
 
+  cl_event srad1LiftEvents[niter];
+  cl_event srad2CalcLiftEvents[niter];
+  cl_event srad2InpLiftEvents[niter];
+
   //====================================================================================================100
-  //	GET PLATFORMS (Intel, AMD, NVIDIA, based on provided library), SELECT ONE
+  //	GET PLATFORMS (Intel, AMD, NVIDIA, based on provided library), SELECT
+  //ONE
   //====================================================================================================100
 
   // Get the number of available platforms
@@ -85,7 +96,8 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     fatal_CL(error, __LINE__);
 
   // Select the 1st platform
-  cl_platform_id platform = platforms[platform_idx];
+//  cl_platform_id platform = platforms[1]; // to run tahiti
+  cl_platform_id platform = platforms[0];
 
   // Get the name of the selected platform and print it (if there are multiple
   // platforms, choose the first one)
@@ -102,8 +114,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
 
   // Create context properties for selected platform
   cl_context_properties context_properties[3] = {
-    CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0
-  };
+      CL_CONTEXT_PLATFORM, (cl_context_properties)platform, 0};
 
   // Create context for selected platform being GPU
   cl_context context;
@@ -132,10 +143,10 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // Select the first device (previousely selected for the context) (if there
   // are multiple devices, choose the first one)
   cl_device_id device;
-  device = devices[device_idx];
+  device = devices[0];
 
   // Get the name of the selected device (previousely selected for the context)
-  // and print it
+  // and print 1t
   error = clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(pbuf), pbuf, NULL);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
@@ -158,6 +169,15 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // Load kernel source code from file
   const char *source = load_kernel_source("./kernel/kernel_gpu_opencl.cl");
   size_t sourceSize = strlen(source);
+
+    size_t global_work_size_lift[2];
+    global_work_size_lift[0] = 512;//Nr ; 
+    global_work_size_lift[1] =512; //Nc; 
+
+    size_t local_work_size_lift[2];
+    local_work_size_lift[0] = 128; 
+    local_work_size_lift[1] = 2; 
+
 
   // Create the program
   cl_program program =
@@ -221,12 +241,27 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
+  cl_kernel srad_kernel_lift1;
+  srad_kernel_lift1 = clCreateKernel(program, "srad_kernel_lift1", &error);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+
+
   // SRAD2 kernel
   cl_kernel srad2_kernel;
   srad2_kernel = clCreateKernel(program, "srad2_kernel", &error);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
+  cl_kernel srad_kernel_lift2;
+  srad_kernel_lift2 = clCreateKernel(program, "srad_kernel_lift2", &error);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+
+  cl_kernel srad_kernel_lift2inp;
+  srad_kernel_lift2inp = clCreateKernel(program, "srad_kernel_lift2inp", &error);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
   // Compress kernel
   cl_kernel compress_kernel;
   compress_kernel = clCreateKernel(program, "compress_kernel", &error);
@@ -254,7 +289,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // common memory size
   //====================================================================================================100
 
-  int mem_size;        // matrix memory size
+  int mem_size; // matrix memory size
   mem_size =
       sizeof(fp) * Ne; // get the size of float representation of input IMAGE
 
@@ -267,6 +302,17 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
+
+  // lift outputs
+  cl_mem d_Coeffs;
+  d_Coeffs = clCreateBuffer(context, CL_MEM_WRITE_ONLY, mem_size, NULL, &error);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+
+  cl_mem d_ImageOutput;
+  d_ImageOutput= clCreateBuffer(context, CL_MEM_WRITE_ONLY, mem_size, NULL, &error);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
   //====================================================================================================100
   // allocate memory for coordinates on DEVICE
   //====================================================================================================100
@@ -394,8 +440,8 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   // workgroups
   int blocks_work_size;
   size_t global_work_size[1];
-  blocks_x = Ne / (int) local_work_size[0];
-  if (Ne % (int) local_work_size[0] !=
+  blocks_x = Ne / (int)local_work_size[0];
+  if (Ne % (int)local_work_size[0] !=
       0) { // compensate for division remainder above by adding one grid
     blocks_x = blocks_x + 1;
   }
@@ -407,7 +453,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   printf("max # of workgroups = %d, # of threads/workgroup = %d (ensure that "
          "device can handle)\n",
          (int)(global_work_size[0] / local_work_size[0]),
-         (int) local_work_size[0]);
+         (int)local_work_size[0]);
 
   //======================================================================================================================================================150
   // 	Extract Kernel - SCALE IMAGE DOWN FROM 0-255 TO 0-1 AND EXTRACT
@@ -542,6 +588,24 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
+
+  //====================================================================================================100
+  //	SRAD Kernel LIFT 1
+  //====================================================================================================100
+
+  error = clSetKernelArg(srad_kernel_lift1, 0, sizeof(cl_mem), (void *)&d_I);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift1, 1, sizeof(cl_mem), (void *)&d_Coeffs);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift1, 2, sizeof(int), (void *)&Nr);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift1, 3, sizeof(int), (void *)&Nc);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+
   //====================================================================================================100
   //	SRAD2 Kernel
   //====================================================================================================100
@@ -590,6 +654,57 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     fatal_CL(error, __LINE__);
 
   //====================================================================================================100
+  //	SRAD Kernel Lift 2 FLY
+  //====================================================================================================100
+  
+  error = clSetKernelArg(srad_kernel_lift2, 0, sizeof(cl_mem), (void *)&d_I);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2, 1, sizeof(cl_mem), (void *)&d_c);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2, 2, sizeof(cl_mem), (void *)&d_ImageOutput);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2, 3, sizeof(int), (void *)&Nr);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2, 4, sizeof(int), (void *)&Nc);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  
+  //====================================================================================================100
+  //	SRAD Kernel Lift 2 INP
+  //====================================================================================================100
+  
+  error = clSetKernelArg(srad_kernel_lift2inp, 0, sizeof(cl_mem), (void *)&d_I);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 1, sizeof(cl_mem), (void *)&d_c);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 2, sizeof(cl_mem), (void *)&d_dN);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 3, sizeof(cl_mem), (void *)&d_dS);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 4, sizeof(cl_mem), (void *)&d_dE);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 5, sizeof(cl_mem), (void *)&d_dW);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 6, sizeof(cl_mem), (void *)&d_ImageOutput);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 7, sizeof(int), (void *)&Nr);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clSetKernelArg(srad_kernel_lift2inp, 8, sizeof(int), (void *)&Nc);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  //====================================================================================================100
   //	End
   //====================================================================================================100
 
@@ -603,7 +718,7 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   for (iter = 0; iter < niter;
        iter++) { // do for the number of iterations input parameter
 
-    printf("%d ", iter);
+   // printf("%d ", iter);
     fflush(NULL);
 
     //====================================================================================================100
@@ -667,15 +782,14 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
       } else {
         mul = mul * NUMBER_THREADS; // update the increment
         blocks_x =
-            blocks2_work_size / (int) local_work_size[0]; // number of blocks
-        if (blocks2_work_size % (int) local_work_size[0] !=
+            blocks2_work_size / (int)local_work_size[0]; // number of blocks
+        if (blocks2_work_size % (int)local_work_size[0] !=
             0) { // compensate for division remainder above by adding one grid
           blocks_x = blocks_x + 1;
         }
         blocks2_work_size = blocks_x;
-        global_work_size2[0] = blocks2_work_size * (int) local_work_size[0];
+        global_work_size2[0] = blocks2_work_size * (int)local_work_size[0];
       }
-
     }
 
     // copy total sums to device
@@ -703,33 +817,115 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     // execute srad kernel
     //====================================================================================================100
 
+    /*
+    error = clFinish(command_queue);
+    error = clEnqueueReadBuffer(command_queue, d_I, CL_TRUE, 0, mem_size, image,
+                                0, NULL, NULL);
+    writeFloatsToFile(image, "./liftdata/imagebefore.txt",
+                      Ne);
+*/
+
+
     // set arguments that were uptaded in this loop
     error = clSetKernelArg(srad_kernel, 12, sizeof(fp), (void *)&q0sqr);
     if (error != CL_SUCCESS)
       fatal_CL(error, __LINE__);
 
+
+    /**************** SRAD 1 **************/
+
+
     // launch kernel
     error = clEnqueueNDRangeKernel(command_queue, srad_kernel, 1, NULL,
                                    global_work_size, local_work_size, 0, NULL,
-                                    &srad1Events[iter]);
+                                   &event1);
+/*
+//                                   &srad1Events[iter]);
+    error = clEnqueueNDRangeKernel(command_queue, srad_kernel_lift1, 2, NULL,
+                                   global_work_size_lift, local_work_size_lift, 0, NULL,
+                                   &srad1LiftEvents[iter]);
+                                   */
     if (error != CL_SUCCESS)
       fatal_CL(error, __LINE__);
 
-    // synchronize
-    // error = clFinish(command_queue);
-    // if (error != CL_SUCCESS)
-    // fatal_CL(error, __LINE__);
 
+    /*
+    error = clFinish(command_queue);
+
+    error = clEnqueueCopyBuffer(command_queue, d_Coeffs, d_c, 0, 0, mem_size, 0, NULL, NULL);
+*/
+
+  /*
+    float srad1Before = get_time();
+
+    error = clEnqueueNDRangeKernel(command_queue, srad_kernel_lift1, 2, NULL,
+                                   global_work_size_lift, local_work_size_lift, 0, NULL,
+                                   NULL);
+    if (error != CL_SUCCESS)
+      fatal_CL(error, __LINE__);
+
+    error = clEnqueueCopyBuffer(command_queue, d_Coeffs, d_c, 0, 0, mem_size, 0, NULL, NULL);
+
+    error = clFinish(command_queue);
+
+    float srad1After = get_time();
+  //  printf("SRAD 1 KERNEL TIME: %.15f\n",srad1After-srad1Before);
+*/
+    
+
+//    error = clEnqueueCopyBuffer(command_queue, d_Coeffs, d_c, 0, 0, mem_size, 0, NULL, NULL);
+/*
+    fp *h_c = (fp *)calloc(Ne, sizeof(fp));
+    fp *dDN = (fp *)calloc(Ne, sizeof(fp));
+    fp *dDS = (fp *)calloc(Ne, sizeof(fp));
+    fp *dDE = (fp *)calloc(Ne, sizeof(fp));
+    fp *dDW = (fp *)calloc(Ne, sizeof(fp));
+    error = clEnqueueReadBuffer(command_queue, d_c, CL_TRUE, 0, mem_size, h_c,
+                                0, NULL, NULL);
+    error = clEnqueueReadBuffer(command_queue, d_dN, CL_TRUE, 0, mem_size, dDN,
+                                0, NULL, NULL);
+    error = clEnqueueReadBuffer(command_queue, d_dS, CL_TRUE, 0, mem_size, dDS,
+                                0, NULL, NULL);
+    error = clEnqueueReadBuffer(command_queue, d_dW, CL_TRUE, 0, mem_size, dDW,
+                                0, NULL, NULL);
+    error = clEnqueueReadBuffer(command_queue, d_dE, CL_TRUE, 0, mem_size, dDE,
+                                0, NULL, NULL);
+
+    writeFloatsToFile(h_c,"liftdata/coeffs.txt", Ne);
+    writeFloatsToFile(dDN, "liftdata/dDN.txt", Ne);
+    writeFloatsToFile(dDS, "liftdata/dDS.txt", Ne);
+    writeFloatsToFile(dDE, "liftdata/dDE.txt", Ne);
+    writeFloatsToFile(dDW,"liftdata/dDW.txt", Ne);
+    free(h_c);
+    free(dDN);
+    free(dDS);
+    free(dDE);
+    free(dDW);
+    */
     //====================================================================================================100
     // execute srad2 kernel
     //====================================================================================================100
-
     // launch kernel
+    
     error = clEnqueueNDRangeKernel(command_queue, srad2_kernel, 1, NULL,
                                    global_work_size, local_work_size, 0, NULL,
-                                   &srad2Events[iter]);
+                                   &event2);
     if (error != CL_SUCCESS)
       fatal_CL(error, __LINE__);
+    /*
+
+    error = clEnqueueNDRangeKernel(command_queue, srad_kernel_lift2inp, 2, NULL,
+                                   global_work_size_lift, local_work_size_lift, 0, NULL,
+                                   &srad2InpLiftEvents[iter]);
+    if (error != CL_SUCCESS)
+      fatal_CL(error, __LINE__);
+*/
+/*
+*/
+
+//    printf("SRAD 2 KERNEL TIME: %.15f\n",srad2After-srad2Before);
+/*
+*/
 
     // synchronize
     // error = clFinish(command_queue);
@@ -739,7 +935,15 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
     //====================================================================================================100
     // End
     //====================================================================================================100
-
+   /* 
+   error = clFinish(command_queue);
+    error = clEnqueueCopyBuffer(command_queue, d_ImageOutput, d_I, 0, 0, mem_size, 0, NULL, NULL);
+    */
+   /*
+    error = clEnqueueReadBuffer(command_queue, d_I, CL_TRUE, 0, mem_size, image,
+                                0, NULL, NULL);
+    writeFloatsToFile(image,"liftdata/finalImage.txt", Ne);
+    */
   }
 
   printf("\n");
@@ -781,12 +985,6 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //	End
   //====================================================================================================100
 
-  
-    double kernel1Time = getTimeForAllEvents(niter,srad1Events);
-    double kernel2Time = getTimeForAllEvents(niter,srad2Events);
-
-    printf("SRAD1: %f SRAD2: %f\n",kernel1Time,kernel2Time);
-
   //======================================================================================================================================================150
   // 	COPY RESULTS BACK TO CPU
   //======================================================================================================================================================150
@@ -804,6 +1002,22 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //======================================================================================================================================================150
   // 	FREE MEMORY
   //======================================================================================================================================================150
+    cl_ulong time_start, time_end;
+    clGetEventProfilingInfo(event1, CL_PROFILING_COMMAND_START, sizeof(time_start), &time_start, NULL);
+    clGetEventProfilingInfo(event1, CL_PROFILING_COMMAND_END, sizeof(time_end), &time_end, NULL);
+
+    double kernel1Time = (time_end-time_start);///1000000000.0;//getTimeForAllEvents(niter,srad1Events);
+    clGetEventProfilingInfo(event2, CL_PROFILING_COMMAND_START, sizeof(time_start), &time_start, NULL);
+    clGetEventProfilingInfo(event2, CL_PROFILING_COMMAND_END, sizeof(time_end), &time_end, NULL);
+    double kernel2Time = (time_end-time_start);///1000000000.0;//getTimeForAllEvents(niter,srad2Events);
+
+
+/*
+    double kernel1Time = getTimeForAllEvents(niter,srad1LiftEvents);
+    double kernel2Time = getTimeForAllEvents(niter,srad2InpLiftEvents);
+
+*/
+    printf("SRAD1: %f SRAD2: %f\n",kernel1Time/1000000.0,kernel2Time/1000000.0);
 
   // OpenCL structures
   error = clReleaseKernel(extract_kernel);
@@ -833,6 +1047,14 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
   error = clReleaseMemObject(d_c);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+
+// lift specific
+  error = clReleaseMemObject(d_ImageOutput);
+  if (error != CL_SUCCESS)
+    fatal_CL(error, __LINE__);
+  error = clReleaseMemObject(d_Coeffs);
   if (error != CL_SUCCESS)
     fatal_CL(error, __LINE__);
 
@@ -883,7 +1105,6 @@ void kernel_gpu_opencl_wrapper(fp *image,  // input image
   //======================================================================================================================================================150
   // 	End
   //======================================================================================================================================================150
-
 }
 
 //========================================================================================================================================================================================================200

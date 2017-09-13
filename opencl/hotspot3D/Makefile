@@ -9,9 +9,10 @@ LIBS = -lOpenCL
 OPENCL_DIR = /if10/kw5na/Packages/AMD-APP-SDK-v2.8-RC-lnx64
 OPENCL_INC = $(OPENCL_DIR)/include/ 
 OPENCL_LIB = $(OPENCL_DIR)/lib/x86_64/ -lOpenCL
+INC=../include/ 
 
-3D: 3D.c CL_helper.c
-	$(CC) $^ $(CCFLAGS) $(LIBS) -I$(OPENCL_INC) -L$(OPENCL_LIB) -o $@
+3D: 3D.c ../include/CL_helper.c 
+	$(CC) $^ $(CCFLAGS) $(LIBS) -I$(OPENCL_INC)-I$(INC)  -L$(OPENCL_LIB) -o $@
 
 clean:
 	rm -f 3D $(OUTPUT) 

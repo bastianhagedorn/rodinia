@@ -1,1 +1,4 @@
-./hotspot 512 2 2 ../../data/hotspot/temp_512 ../../data/hotspot/power_512 output.out
+#!/bin/bash
+DATADIR=/home/v1bhaged/benchmarks/rodinia/data
+
+./hotspot 512 2 2 $DATADIR/hotspot/temp_512 $DATADIR/hotspot/power_512 output.out 0 0

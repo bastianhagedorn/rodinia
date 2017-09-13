@@ -3,13 +3,14 @@
 #include <sys/types.h>
 #include <CL/cl.h>
 #include "CL_helper.h"
+#include "../hotspot/OpenCL_helper_library.h"
+#include "../include/constants.h"
 
 #ifndef DEVICE
 #define DEVICE CL_DEVICE_TYPE_DEFAULT
 #endif
 
 #define TOL      (0.001)
-#define STR_SIZE (256)
 #define MAX_PD   (3.0e6)
 
 /* required precision in degrees	*/
@@ -22,10 +23,6 @@
 
 #define WG_SIZE_X (64)
 #define WG_SIZE_Y (4)
-float t_chip      = 0.0005;
-float chip_height = 0.016;
-float chip_width  = 0.016;
-float amb_temp    = 80.0;
 
 void usage(int argc, char **argv)
 {
@@ -37,6 +34,8 @@ void usage(int argc, char **argv)
   fprintf(stderr, "\t<powerFile>  - name of the file containing the initial power values of each cell\n");
   fprintf(stderr, "\t<tempFile>  - name of the file containing the initial temperature values of each cell\n");
   fprintf(stderr, "\t<outputFile - output file\n");
+  fprintf(stderr, "\t<platform_id> - index of the OpenCL platform\n");
+  fprintf(stderr, "\t<device_id> - index of the OpenCL device\n");
   exit(1);
 }
 
@@ -44,7 +43,7 @@ void usage(int argc, char **argv)
 
 int main(int argc, char** argv)
 {
-  if (argc != 7)
+  if (argc != 9)
     {
       usage(argc,argv);
     }
@@ -58,6 +57,8 @@ int main(int argc, char** argv)
   int numCols      = atoi(argv[1]);
   int numRows      = atoi(argv[1]);
   int layers       = atoi(argv[2]);
+
+  cl_event events[iterations];
 
   /* calculating parameters*/
 
@@ -82,7 +83,6 @@ int main(int argc, char** argv)
   cc               = 1.0 - (2.0*ce + 2.0*cn + 3.0*ct);
 
 
-  int          err;           
   int size = numCols * numRows * layers;
   float*        tIn      = (float*) calloc(size,sizeof(float));
   float*        pIn      = (float*) calloc(size,sizeof(float));
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
   size_t local[2];
   memcpy(tempCopy,tIn, size * sizeof(float));
 
-  cl_device_id     device_id;     
+  cl_device_id device;
   cl_context       context;       
   cl_command_queue commands;      
   cl_program       program;       
@@ -107,48 +107,60 @@ int main(int argc, char** argv)
   cl_mem d_b;                     
   cl_mem d_c;                     
   const char *KernelSource = load_kernel_source("hotspotKernel.cl"); 
+
+
+  cl_int err;
   cl_uint numPlatforms;
-
+  
+  // Get the number of platforms
   err = clGetPlatformIDs(0, NULL, &numPlatforms);
-  if (err != CL_SUCCESS || numPlatforms <= 0)
-    {
-      printf("Error: Failed to find a platform!\n%s\n",err_code(err));
-      return EXIT_FAILURE;
-    }
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  
+  // Get the list of platforms
+  cl_platform_id *platforms =
+      (cl_platform_id *)malloc(sizeof(cl_platform_id) * numPlatforms);
+  err = clGetPlatformIDs(numPlatforms, platforms, NULL);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  
+  // Print the chosen platform (if there are multiple platforms, choose the first one)
+  int platform_id = atoi(argv[7]);
+  cl_platform_id platform = platforms[platform_id];
+  char pbuf[100];
+  err = clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(pbuf), pbuf, NULL);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  printf("Platform: %s\n", pbuf);
+  
+  // Create a GPU context
+  cl_context_properties context_properties[3] = {CL_CONTEXT_PLATFORM,
+  					       (cl_context_properties)platform, 0};
+  context =
+      clCreateContextFromType(context_properties, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  
+  // Get and print the chosen device (if there are multiple devices, choose the first one)
+  size_t devices_size;
+  err = clGetContextInfo(context, CL_CONTEXT_DEVICES, 0, NULL, &devices_size);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  cl_device_id *devices = (cl_device_id *)malloc(devices_size);
+  err = clGetContextInfo(context, CL_CONTEXT_DEVICES, devices_size, devices, NULL);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  int device_id = atoi(argv[8]);
+  device = devices[device_id];
+  err = clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(pbuf), pbuf, NULL);
+  if (err != CL_SUCCESS) fatal_CL(err, __LINE__);
+  printf("Device: %s\n", pbuf);
 
-  cl_platform_id Platform[numPlatforms];
-  err = clGetPlatformIDs(numPlatforms, Platform, NULL);
-  if (err != CL_SUCCESS || numPlatforms <= 0)
-    {
-      printf("Error: Failed to get the platform!\n%s\n",err_code(err));
-      return EXIT_FAILURE;
-    }
 
-  for (i = 0; i < numPlatforms; i++)
-    {
-      err = clGetDeviceIDs(Platform[i], DEVICE, 1, &device_id, NULL);
-      if (err == CL_SUCCESS)
-        {
-          break;
-        } 
-    }
 
-  if (device_id == NULL)
+  if (device == NULL)
     {
       printf("Error: Failed to create a device group!\n%s\n",err_code(err));
       return EXIT_FAILURE;
     }
 
-  err = output_device_info(device_id);
+  err = output_device_info(device);
 
-  context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
-  if (!context)
-    {
-      printf("Error: Failed to create a compute context!\n%s\n", err_code(err));
-      return EXIT_FAILURE;
-    }
-
-  commands = clCreateCommandQueue(context, device_id, 0, &err);
+  commands = clCreateCommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, &err);
   if (!commands)
     {
       printf("Error: Failed to create a command commands!\n%s\n", err_code(err));
@@ -169,7 +181,7 @@ int main(int argc, char** argv)
       char buffer[2048];
 
       printf("Error: Failed to build program executable!\n%s\n", err_code(err));
-      clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+      clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
       printf("%s\n", buffer);
       return EXIT_FAILURE;
     }
@@ -241,7 +253,7 @@ int main(int argc, char** argv)
       local[0] = WG_SIZE_X;
       local[1] = WG_SIZE_Y;
 
-      err = clEnqueueNDRangeKernel(commands, ko_vadd, 2, NULL, global, local, 0, NULL, NULL);
+      err = clEnqueueNDRangeKernel(commands, ko_vadd, 2, NULL, global, local, 0, NULL, &events[j]);
       if (err)
         {
           printf("Error: Failed to execute kernel!\n%s\n", err_code(err));
@@ -267,7 +279,7 @@ int main(int argc, char** argv)
 
   float acc = accuracy(tempOut,answer,numRows*numCols*layers);
   float time = (float)((stop - start)/(1000.0 * 1000.0));
-  printf("Time: %.3f (s)\n",time);
+  printf("Time: %.6f (s)\n",getTimeForAllEvents(iterations,events));
   printf("Accuracy: %e\n",acc);
 
   writeoutput(tempOut,numRows,numCols,layers,ofile);
