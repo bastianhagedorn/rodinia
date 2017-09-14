@@ -1,5 +1,5 @@
 #!/bin/bash
-N=10
+N=100
 
 if [ "$#" -ne 5 ]; then
 				echo "Illegal number of parameters (enter platform, device, iterations, rows and columns)"
