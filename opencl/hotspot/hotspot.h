@@ -1,7 +1,6 @@
 #ifndef HOTSPOT_H
 #define HOTSPOT_H
 
-#include "OpenCL_helper_library.h"
 
 #include <CL/cl.h>
 
@@ -23,6 +22,11 @@ void readinput(float *, int, int, char *);
 int compute_tran_temp(cl_mem, cl_mem[2], int, int, int, int, int, int, int, int, float *, float *);
 void usage(int, char **);
 void run(int, char **);
+double getTimeForAllEvents(int numEvents, cl_event* events);
+void  fatal(char* s);
+void fatal_CL(cl_int error, int line_no);
+long long get_time(); 
+char* load_kernel_source(const char* filename);
 
 
 

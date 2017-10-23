@@ -268,7 +268,6 @@ int main(int argc, char **argv) {
 	float acc = accuracy(tempOut, answer, numRows * numCols * layers);
 	float time = (float)((stop - start) / (1000.0 * 1000.0));
 	printf("Time: %.6f (s)\n", getTimeForAllEvents(iterations, events));
-	printf("[DEBUG] Iterations: %d\n", iterations);
 	printf("Accuracy: %e\n", acc);
 
 	writeoutput(tempOut, numRows, numCols, layers, ofile);

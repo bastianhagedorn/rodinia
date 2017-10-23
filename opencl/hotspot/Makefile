@@ -11,7 +11,7 @@ CC_FLAGS = -g -O3 -Wall
 EXE = hotspot
 
 $(EXE): hotspot.c hotspot.h   
-	$(CC) $(KERNEL_DIM) $(CC_FLAGS) -o $(EXE) -I$(OPENCL_INC) ../include/CL_helper.c hotspot.c -L$(OPENCL_LIB) -lOpenCL -lm 
+	$(CC) $(KERNEL_DIM) $(CC_FLAGS) -o $(EXE) -I$(OPENCL_INC) hotspot.c -L$(OPENCL_LIB) -lOpenCL -lm 
 
 clean:
 	rm -f $(EXE)
