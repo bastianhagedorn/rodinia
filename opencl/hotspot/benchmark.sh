@@ -11,7 +11,7 @@ fi
 rm hotspot.raw
 rm hotspot.out
 
-for i in {1..10}
+for i in {1..100}
 do
 ./hotspot $3 1 1 $DATADIR/hotspot/temp_$3 $DATADIR/hotspot/power_$3 output.out $1 $2 >> hotspot.raw
 done
