@@ -5,6 +5,7 @@
 #include "CL_helper.h"
 #include "../hotspot/OpenCL_helper_library.h"
 #include "../include/constants.h"
+#include "../include/CL_helper.h"
 
 #ifndef DEVICE
 #define DEVICE CL_DEVICE_TYPE_DEFAULT
